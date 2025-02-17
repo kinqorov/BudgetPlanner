@@ -5,5 +5,6 @@ export default defineConfig(({ command, mode, ssrBuild }) => ({
     cssMinify: false, // Deactivate esbuild and use cssnano for CSS only
     minify: false,
     assetsDir: ".",
+    base: "/"
   },
 }));
