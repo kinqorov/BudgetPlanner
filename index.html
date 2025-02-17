@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Planner</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/chatSupport.js" type="module"></script>
+    <script defer src="js/planner.js" type="module"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Budget Planner</h1>
+        <button id="auth-button">Login with Biometrics</button>
+    </header>
+
+    <main>
+        <section id="income-section">
+            <h2>Income</h2>
+            <form id="add-income-form">
+                <input type="text" id="income-description" placeholder="Description" required>
+                <input type="number" id="income-amount" placeholder="Amount" required>
+                <button type="submit">Add or update Income</button>
+            </form>
+            <ul id="income-list"></ul>
+        </section>
+
+        <section id="expense-section">
+            <h2>Expenses</h2>
+            <form id="add-expense-form">
+                <input type="text" id="expense-description" placeholder="Description" required>
+                <input type="number" id="expense-amount" placeholder="Amount" required>
+                <select id="expense-category">
+                    <option value="food">Food</option>
+                    <option value="transport">Transport</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="other">Other</option>
+                </select>
+                <button type="submit">Add or update Expense</button>
+            </form>
+            <ul id="expense-list"></ul>
+        </section>
+
+        <section id="summary-section">
+            <h2>Summary</h2>
+            <div id="total-income">Total Income: $0</div>
+            <div id="total-expenses">Total Expenses: $0</div>
+            <div id="balance">Balance: $0</div>
+        </section>
+
+        <section id="visualization-section">
+            <h2>Visualization</h2>
+            <canvas id="expense-chart"></canvas>
+        </section>
+
+        <section id="qr-section">
+            <h2>Share Your Planner</h2>
+            <div id="qr-code-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built with love for your financial planning needs.</p>
+    </footer>
+
+    <button id="chat-support-btn">Chat with Support</button>
+
+</body>
+</html>
