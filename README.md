@@ -2,8 +2,7 @@
 
 ```bash
 npm install
-npm run build
-python -m http.server --directory ./dist
+npm run preview
 ```
 
-Then go to `localhost:8000`
+Then go to `http://localhost:4173/BudgetPlanner/`
