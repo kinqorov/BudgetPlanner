@@ -1,4 +1,4 @@
-import { db } from "./firebaseConfig.js";
+import { db, auth } from "./firebaseConfig.js";
 import { v4 as uuidv4 } from "uuid";
 import {
   collection,
@@ -7,6 +7,24 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { GoogleAuthProvider } from "firebase/auth";
+import { signInWithCredential } from "firebase/auth/web-extension";
+
+const localStorageAuthData = localStorage["authData"];
+if (!localStorageAuthData) {
+  window.location.href = "signin.html";
+}
+
+const authData = GoogleAuthProvider.credential(
+  JSON.parse(localStorageAuthData).idToken,
+);
+
+const res = await signInWithCredential(auth, authData);
+console.log("got user", res.user.uid);
+const collectionNames = {
+  incomes: `${res.user.uid}_incomes`,
+  expenses: `${res.user.uid}_expenses`,
+};
 
 // Income and Expense
 const incomeForm = document.getElementById("add-income-form");
@@ -22,7 +40,7 @@ function readIncomes() {
     incomeList.removeChild(incomeList.firstChild);
   }
   totalIncome = 0;
-  const incomesCollection = collection(db, "incomes");
+  const incomesCollection = collection(db, collectionNames.incomes);
   getDocs(incomesCollection).then((incomesSnapshot) => {
     const incomes = incomesSnapshot.docs.map((doc) => doc.data());
     console.log(incomes);
@@ -50,8 +68,8 @@ function showIncome(incomeData) {
 
   listItem.querySelector(".delete").addEventListener("click", () => {
     console.log("deleting", incomeData.description, incomeData.uuid);
-    deleteDoc(doc(db, "incomes", incomeData.uuid)).catch((error) =>
-      console.log(error),
+    deleteDoc(doc(db, collectionNames.incomes, incomeData.uuid)).catch(
+      (error) => console.log(error),
     );
     totalIncome -= incomeData.amount;
     listItem.remove();
@@ -70,7 +88,7 @@ function addIncome(description, amount) {
     description: description,
     amount: amount,
   };
-  setDoc(doc(db, "incomes", uuid), incomeData);
+  setDoc(doc(db, collectionNames.incomes, uuid), incomeData);
   return incomeData;
 }
 
@@ -80,7 +98,7 @@ function updateIncome(uuid, description, amount) {
     description: description,
     amount: amount,
   };
-  setDoc(doc(db, "incomes", uuid), incomeData);
+  setDoc(doc(db, collectionNames.incomes, uuid), incomeData);
   incomeUpdateUUID = null;
   return incomeData;
 }
@@ -118,7 +136,7 @@ function readExpenses() {
     expenseList.removeChild(expenseList.firstChild);
   }
   totalExpenses = 0;
-  const expensesCollection = collection(db, "expenses");
+  const expensesCollection = collection(db, collectionNames.expenses);
   getDocs(expensesCollection).then((expensesSnapshot) => {
     const expenses = expensesSnapshot.docs.map((doc) => doc.data());
     console.log(expenses);
@@ -147,8 +165,8 @@ function showExpense(expenseData) {
 
   listItem.querySelector(".delete").addEventListener("click", () => {
     console.log("deleting", expenseData.description, expenseData.uuid);
-    deleteDoc(doc(db, "expenses", expenseData.uuid)).catch((error) =>
-      console.log(error),
+    deleteDoc(doc(db, collectionNames.expenses, expenseData.uuid)).catch(
+      (error) => console.log(error),
     );
     totalExpenses -= expenseData.amount;
     listItem.remove();
@@ -168,7 +186,7 @@ function addExpense(description, amount, category) {
     amount: amount,
     category: category,
   };
-  setDoc(doc(db, "expenses", uuid), expenseData);
+  setDoc(doc(db, collectionNames.expenses, uuid), expenseData);
   return expenseData;
 }
 
@@ -179,7 +197,7 @@ function updateExpense(uuid, description, amount, category) {
     amount: amount,
     category: category,
   };
-  setDoc(doc(db, "expenses", uuid), expenseData);
+  setDoc(doc(db, collectionNames.expenses, uuid), expenseData);
   expenseUpdateUUID = null;
   return expenseData;
 }
@@ -213,3 +231,10 @@ function updateSummary() {
   totalExpensesDisplay.textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
   balanceDisplay.textContent = `Balance: $${(totalIncome - totalExpenses).toFixed(2)}`;
 }
+
+document
+  .getElementById("signout-button")
+  .addEventListener("click", function () {
+    localStorage.removeItem("authData");
+    window.location.href = "signin.html";
+  });
